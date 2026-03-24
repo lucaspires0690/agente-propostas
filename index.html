@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agente de Propostas — Lucas Pires</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a1810;
+    --bg2: #0f2018;
+    --bg3: #1a3a2a;
+    --gold: #ffe000;
+    --gold2: #e8c46a;
+    --green: #2d5c42;
+    --text: #f0ede6;
+    --text2: #a8a49a;
+    --teal: #5DCAA5;
+    --red: #e24b4a;
+    --border: rgba(232,196,106,0.15);
+    --radius: 12px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--gold);
+    letter-spacing: 2px;
+  }
+  .logo span {
+    color: var(--text2);
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 3px;
+    display: block;
+    margin-top: 2px;
+  }
+  .status-wrap { display: flex; align-items: center; gap: 8px; }
+  .status-dot { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+  .status-txt { font-size: 11px; color: var(--text2); font-family: 'DM Mono', monospace; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 28px 20px; }
+
+  .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold2);
+    margin-bottom: 10px;
+    opacity: 0.8;
+  }
+
+  .perfil-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+  }
+  .perfil-avatar {
+    width: 46px; height: 46px;
+    background: var(--bg3);
+    border-radius: 50%;
+    border: 2px solid var(--gold2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .perfil-info { flex: 1; }
+  .perfil-info strong { color: var(--text); font-weight: 500; font-size: 14px; }
+  .perfil-info p { font-size: 12px; color: var(--text2); margin-top: 2px; line-height: 1.5; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .tag {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--gold2);
+  }
+
+  .input-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .input-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+  textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 13px 15px;
+    resize: vertical;
+    min-height: 150px;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.65;
+  }
+  textarea:focus { border-color: rgba(232,196,106,0.4); }
+  textarea::placeholder { color: var(--text2); opacity: 0.55; }
+
+  .configs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .config-group label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold2);
+    display: block;
+    margin-bottom: 7px;
+  }
+  select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 10px 12px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23e8c46a'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+  select option { background: #0f2018; }
+
+  .modelo-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .modelo-label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold2);
+    opacity: 0.8;
+    margin-right: 4px;
+  }
+  .modelo-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text2);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modelo-btn.ativo {
+    background: var(--bg3);
+    border-color: var(--gold2);
+    color: var(--gold);
+  }
+
+  .btn-gerar {
+    width: 100%;
+    background: var(--gold);
+    color: #0a1810;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    border: none;
+    border-radius: var(--radius);
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 18px;
+  }
+  .btn-gerar:hover { background: #f5d840; transform: translateY(-1px); }
+  .btn-gerar:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 36px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-top: 20px;
+  }
+  .loading.show { display: block; }
+  .loading-ring {
+    width: 38px; height: 38px;
+    border: 2px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 14px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading p { color: var(--text2); font-size: 12px; font-family: 'DM Mono', monospace; letter-spacing: 1px; }
+
+  .resultado { display: none; margin-top: 20px; }
+  .resultado.show { display: block; }
+
+  .resultado-header {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .nicho-badge {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--bg3);
+    color: var(--teal);
+    border: 1px solid rgba(93,202,165,0.25);
+  }
+  .arquetipos-badge { font-size: 11px; color: var(--text2); font-family: 'DM Mono', monospace; }
+
+  .proposta-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 26px 26px 22px;
+  }
+  .proposta-texto {
+    font-size: 14.5px;
+    line-height: 1.85;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+  .proposta-texto strong { color: var(--gold); font-weight: 500; }
+
+  .analise-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+  .analise-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 13px;
+  }
+  .a-label {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold2);
+    margin-bottom: 5px;
+    opacity: 0.7;
+  }
+  .a-value { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+  .actions { display: flex; gap: 10px; margin-top: 14px; }
+  .btn-copy {
+    flex: 1;
+    background: var(--bg3);
+    color: var(--gold);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-copy:hover { background: var(--green); border-color: var(--gold2); }
+  .btn-nova {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-nova:hover { border-color: var(--text2); color: var(--text); }
+
+  .dica {
+    background: var(--bg2);
+    border: 1px solid rgba(93,202,165,0.18);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 8px 8px 0;
+    padding: 13px 16px;
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+  .dica strong { color: var(--teal); }
+
+  .erro-box {
+    background: rgba(226,75,74,0.08);
+    border: 1px solid rgba(226,75,74,0.25);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #f09595;
+    display: none;
+  }
+  .erro-box.show { display: block; }
+
+  .historico { margin-top: 28px; }
+  .hist-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 17px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .hist-item:hover { border-color: rgba(232,196,106,0.3); }
+  .h-nicho { font-size: 10px; font-family: 'DM Mono', monospace; letter-spacing: 1.5px; color: var(--teal); text-transform: uppercase; margin-bottom: 3px; }
+  .h-preview { font-size: 13px; color: var(--text2); }
+  .h-data { font-size: 11px; color: var(--text2); font-family: 'DM Mono', monospace; white-space: nowrap; margin-left: 14px; }
+
+  @media (max-width: 600px) {
+    .configs { grid-template-columns: 1fr; }
+    .analise-grid { grid-template-columns: 1fr; }
+    .header { padding: 14px 18px; }
+    .container { padding: 18px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">LUCAS PIRES<span>AGENTE DE PROPOSTAS · GROQ + LLAMA</span></div>
+  </div>
+  <div class="status-wrap">
+    <div class="status-dot"></div>
+    <span class="status-txt">ONLINE</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="perfil-box">
+    <div class="perfil-avatar">LP</div>
+    <div class="perfil-info">
+      <strong>Lucas Pires</strong>
+      <p>Especialista em Transcrição com Diarização de Falantes — Documento Pronto, ABNT e Sigilo Total</p>
+      <div class="tags">
+        <span class="tag">Diarização completa</span>
+        <span class="tag">ABNT</span>
+        <span class="tag">Sigilo total</span>
+        <span class="tag">24h</span>
+        <span class="tag">Documento pronto</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <div class="label">01 — Anúncio do cliente</div>
+    <h2>Cole o anúncio completo aqui</h2>
+    <textarea id="anuncio" placeholder="Cole aqui o anúncio completo — título, descrição, requisitos, prazo, orçamento. Quanto mais detalhes, mais certeira a proposta..."></textarea>
+
+    <div class="configs">
+      <div class="config-group">
+        <label>Plataforma</label>
+        <select id="plataforma">
+          <option value="auto">Detectar automaticamente</option>
+          <option value="99freelas">99Freelas</option>
+          <option value="workana">Workana</option>
+          <option value="getninjas">GetNinjas</option>
+          <option value="fiverr">Fiverr</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="direto">Contato direto</option>
+        </select>
+      </div>
+      <div class="config-group">
+        <label>Intensidade persuasiva</label>
+        <select id="intensidade">
+          <option value="equilibrada">Equilibrada — profissional e direto</option>
+          <option value="alta">Alta — máxima persuasão</option>
+          <option value="sutil">Sutil — confiança silenciosa</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modelo-row">
+      <span class="modelo-label">Modelo:</span>
+      <button class="modelo-btn ativo" onclick="selecionarModelo('llama-3.3-70b-versatile', this)">Llama 3.3 70B</button>
+      <button class="modelo-btn" onclick="selecionarModelo('mixtral-8x7b-32768', this)">Mixtral 8x7B</button>
+      <button class="modelo-btn" onclick="selecionarModelo('llama-3.1-8b-instant', this)">Llama 3.1 8B ⚡</button>
+    </div>
+
+    <button class="btn-gerar" id="btnGerar" onclick="gerarProposta()">
+      ✦ Gerar Proposta Irresistível
+    </button>
+  </div>
+
+  <div class="erro-box" id="erroBox"></div>
+  <div class="loading" id="loading">
+    <div class="loading-ring"></div>
+    <p id="loadingMsg">Analisando o anúncio...</p>
+  </div>
+
+  <div class="resultado" id="resultado">
+    <div class="resultado-header">
+      <span class="nicho-badge" id="nichoBadge">—</span>
+      <span class="arquetipos-badge" id="arquetiposBadge"></span>
+    </div>
+    <div class="proposta-box">
+      <div class="proposta-texto" id="propostaTexto"></div>
+      <div class="analise-grid" id="analiseGrid"></div>
+    </div>
+    <div class="actions">
+      <button class="btn-copy" onclick="copiarProposta()">⊕ Copiar proposta completa</button>
+      <button class="btn-nova" onclick="novaProposta()">Nova proposta</button>
+    </div>
+    <div class="dica" id="dicaEstrategica"></div>
+  </div>
+
+  <div class="historico" id="historico" style="display:none">
+    <div class="label" style="margin-top:8px;">Histórico recente</div>
+    <div id="historicoLista"></div>
+  </div>
+
+</div>
+
+<script>
+let modeloAtual = 'llama-3.3-70b-versatile';
+let propostaAtual = '';
+let historico = [];
+try { historico = JSON.parse(localStorage.getItem('lp_hist') || '[]'); } catch(e) {}
+
+const MSGS = [
+  'Analisando o anúncio...',
+  'Detectando nicho e dor do cliente...',
+  'Ativando arquétipos persuasivos...',
+  'Calibrando gatilhos mentais...',
+  'Personalizando para Lucas Pires...',
+  'Finalizando proposta irresistível...'
+];
+
+function selecionarModelo(m, btn) {
+  modeloAtual = m;
+  document.querySelectorAll('.modelo-btn').forEach(b => b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+}
+
+async function gerarProposta() {
+  const anuncio = document.getElementById('anuncio').value.trim();
+  if (!anuncio || anuncio.length < 20) {
+    mostrarErro('Cole o anúncio completo para gerar uma proposta certeira.');
+    return;
+  }
+
+  esconderErro();
+  document.getElementById('btnGerar').disabled = true;
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('resultado').classList.remove('show');
+
+  let i = 0;
+  const timer = setInterval(() => {
+    document.getElementById('loadingMsg').textContent = MSGS[i++ % MSGS.length];
+  }, 1100);
+
+  try {
+    const res = await fetch('/api/proposta', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        anuncio,
+        plataforma: document.getElementById('plataforma').value,
+        intensidade: document.getElementById('intensidade').value,
+        modelo: modeloAtual
+      })
+    });
+
+    clearInterval(timer);
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
+
+    parsearEExibir(data.resultado);
+
+  } catch(err) {
+    clearInterval(timer);
+    document.getElementById('loading').classList.remove('show');
+    mostrarErro(`Erro: ${err.message}`);
+  }
+
+  document.getElementById('btnGerar').disabled = false;
+}
+
+function parsearEExibir(texto) {
+  const linhas = texto.split('\n');
+  let nicho='', arq='', dorP='', dorI='', gatilhos='', dica='', proposta='';
+  let emProposta = false;
+
+  for (const l of linhas) {
+    if (l.trim() === '---PROPOSTA---') { emProposta = true; continue; }
+    if (emProposta) { proposta += l + '\n'; continue; }
+    if (l.startsWith('NICHO:')) nicho = l.replace('NICHO:','').trim();
+    if (l.startsWith('ARQUETIPOS:')) arq = l.replace('ARQUETIPOS:','').trim();
+    if (l.startsWith('DOR_PRINCIPAL:')) dorP = l.replace('DOR_PRINCIPAL:','').trim();
+    if (l.startsWith('DOR_IMPLICITA:')) dorI = l.replace('DOR_IMPLICITA:','').trim();
+    if (l.startsWith('GATILHOS:')) gatilhos = l.replace('GATILHOS:','').trim();
+    if (l.startsWith('DICA:')) dica = l.replace('DICA:','').trim();
+  }
+
+  proposta = proposta.trim();
+  propostaAtual = proposta;
+
+  document.getElementById('nichoBadge').textContent = nicho || 'Nicho detectado';
+  document.getElementById('arquetiposBadge').textContent = arq ? `✦ ${arq}` : '';
+  document.getElementById('propostaTexto').innerHTML = proposta
+    .replace(/\{b\}/g,'<strong>').replace(/\{\/b\}/g,'</strong>')
+    .replace(/\{i\}/g,'<em>').replace(/\{\/i\}/g,'</em>');
+  document.getElementById('analiseGrid').innerHTML = `
+    <div class="analise-card"><div class="a-label">Dor principal</div><div class="a-value">${dorP||'—'}</div></div>
+    <div class="analise-card"><div class="a-label">Dor implícita</div><div class="a-value">${dorI||'—'}</div></div>
+    <div class="analise-card"><div class="a-label">Gatilhos ativos</div><div class="a-value">${gatilhos||'—'}</div></div>
+  `;
+  document.getElementById('dicaEstrategica').innerHTML =
+    `<strong>Dica estratégica:</strong> ${dica||'Responda nos primeiros 10 minutos — 3x mais chance de ser lido.'}`;
+
+  historico.unshift({ id: Date.now(), nicho, preview: proposta.substring(0,75)+'...', proposta, data: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) });
+  if (historico.length > 10) historico.pop();
+  try { localStorage.setItem('lp_hist', JSON.stringify(historico)); } catch(e) {}
+  renderHistorico();
+
+  document.getElementById('loading').classList.remove('show');
+  document.getElementById('resultado').classList.add('show');
+  document.getElementById('resultado').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function copiarProposta() {
+  navigator.clipboard.writeText(propostaAtual).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copiado!';
+    btn.style.background = 'var(--teal)';
+    btn.style.color = '#0a1810';
+    setTimeout(() => { btn.textContent = orig; btn.style.background=''; btn.style.color=''; }, 2000);
+  });
+}
+
+function novaProposta() {
+  document.getElementById('resultado').classList.remove('show');
+  document.getElementById('anuncio').value = '';
+  esconderErro();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function mostrarErro(msg) {
+  const el = document.getElementById('erroBox');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function esconderErro() {
+  document.getElementById('erroBox').classList.remove('show');
+}
+
+function renderHistorico() {
+  if (!historico.length) return;
+  document.getElementById('historico').style.display = 'block';
+  document.getElementById('historicoLista').innerHTML = historico.map(h => `
+    <div class="hist-item" onclick="carregarHist(${h.id})">
+      <div>
+        <div class="h-nicho">${h.nicho}</div>
+        <div class="h-preview">${h.preview}</div>
+      </div>
+      <div class="h-data">${h.data}</div>
+    </div>
+  `).join('');
+}
+
+function carregarHist(id) {
+  const h = historico.find(x => x.id === id);
+  if (!h) return;
+  propostaAtual = h.proposta;
+  document.getElementById('nichoBadge').textContent = h.nicho;
+  document.getElementById('propostaTexto').innerHTML = h.proposta
+    .replace(/\{b\}/g,'<strong>').replace(/\{\/b\}/g,'</strong>');
+  document.getElementById('resultado').classList.add('show');
+  document.getElementById('resultado').scrollIntoView({ behavior:'smooth' });
+}
+
+renderHistorico();
+</script>
+</body>
+</html>
